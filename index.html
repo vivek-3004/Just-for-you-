@@ -182,6 +182,7 @@
         let timerInterval;
         let timeLeft = 0;
         let totalTime = 0;
+        let backgroundWorker;
 
         const textEl = document.getElementById('affirmation-text');
         const buttonsEl = document.getElementById('action-buttons');
@@ -193,37 +194,32 @@
         const toastEl = document.getElementById('notification-toast');
         const statusEl = document.getElementById('notif-status');
 
-        // Service Worker registration for Background Tasks
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                self.addEventListener('install', (event) => self.skipWaiting());
-                self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()));
-                
-                let backgroundTimer;
-                self.addEventListener('message', (event) => {
-                    if (event.data.action === 'startTimer') {
-                        clearInterval(backgroundTimer);
-                        let seconds = event.data.minutes * 60;
-                        backgroundTimer = setInterval(() => {
-                            seconds--;
-                            if (seconds <= 0) {
-                                self.registration.showNotification('Affirmation', {
-                                    body: event.data.message,
-                                    icon: 'https://img.icons8.com/ios-filled/100/f43f5e/lotus.png',
-                                    badge: 'https://img.icons8.com/ios-filled/100/f43f5e/lotus.png',
-                                    tag: 'affirmation-notif'
-                                });
-                                seconds = event.data.minutes * 60; // Loop
-                            }
-                        }, 1000);
-                    } else if (event.data.action === 'stopTimer') {
-                        clearInterval(backgroundTimer);
-                    }
-                });
-            `;
-            const blob = new Blob([swCode], { type: 'text/javascript' });
-            navigator.serviceWorker.register(URL.createObjectURL(blob));
-        }
+        // Use Web Workers for reliable background timing within the sandbox
+        const workerCode = `
+            let timer;
+            self.onmessage = function(e) {
+                if (e.data.action === 'start') {
+                    clearInterval(timer);
+                    let seconds = e.data.minutes * 60;
+                    timer = setInterval(() => {
+                        seconds--;
+                        if (seconds <= 0) {
+                            self.postMessage('trigger');
+                            seconds = e.data.minutes * 60;
+                        }
+                    }, 1000);
+                } else if (e.data.action === 'stop') {
+                    clearInterval(timer);
+                }
+            };
+        `;
+        const blob = new Blob([workerCode], { type: 'text/javascript' });
+        backgroundWorker = new Worker(URL.createObjectURL(blob));
+
+        backgroundWorker.onmessage = function() {
+            const msg = affirmations[Math.floor(Math.random() * affirmations.length)];
+            triggerNotification(msg);
+        };
 
         async function requestNotificationPermission() {
             if (!("Notification" in window)) return false;
@@ -240,18 +236,32 @@
             return false;
         }
 
-        function newAffirmation(isAuto = false) {
-            textEl.classList.remove('fade-in');
-            void textEl.offsetWidth; 
+        function triggerNotification(message) {
+            // Internal UI Toast
+            toastEl.classList.remove('translate-y-32');
+            setTimeout(() => toastEl.classList.add('translate-y-32'), 6000);
+
+            // System Notification
+            if (Notification.permission === "granted") {
+                new Notification("Affirmation", {
+                    body: message,
+                    icon: 'https://img.icons8.com/ios-filled/100/f43f5e/lotus.png'
+                });
+            }
+            
+            // Update UI if user happens to be looking
+            newAffirmation(false);
+        }
+
+        function newAffirmation(triggerAnimation = true) {
+            if (triggerAnimation) {
+                textEl.classList.remove('fade-in');
+                void textEl.offsetWidth; 
+            }
             const random = affirmations[Math.floor(Math.random() * affirmations.length)];
             textEl.innerText = random;
-            textEl.classList.add('fade-in');
+            if (triggerAnimation) textEl.classList.add('fade-in');
             buttonsEl.style.opacity = '1';
-
-            if(isAuto) {
-                toastEl.classList.remove('translate-y-32');
-                setTimeout(() => toastEl.classList.add('translate-y-32'), 6000);
-            }
             return random;
         }
 
@@ -262,32 +272,19 @@
             window.speechSynthesis.speak(speech);
         }
 
-        function syncWithBackground() {
-            if (navigator.serviceWorker.controller) {
-                const message = affirmations[Math.floor(Math.random() * affirmations.length)];
-                navigator.serviceWorker.controller.postMessage({
-                    action: 'startTimer',
-                    minutes: parseInt(rangeEl.value),
-                    message: message
-                });
-            }
-        }
-
         function startTimer() {
             const mins = parseInt(rangeEl.value);
             totalTime = mins * 60;
             timeLeft = totalTime;
             
             clearInterval(timerInterval);
-            syncWithBackground();
+            backgroundWorker.postMessage({ action: 'start', minutes: mins });
 
             timerInterval = setInterval(() => {
                 timeLeft--;
                 progressEl.style.width = `${((totalTime - timeLeft) / totalTime) * 100}%`;
                 if (timeLeft <= 0) {
-                    newAffirmation(true);
                     timeLeft = totalTime;
-                    syncWithBackground(); // Refresh the next message for BG
                 }
             }, 1000);
         }
@@ -306,9 +303,7 @@
                 settingsEl.style.opacity = '0.4';
                 settingsEl.style.pointerEvents = 'none';
                 clearInterval(timerInterval);
-                if (navigator.serviceWorker.controller) {
-                    navigator.serviceWorker.controller.postMessage({ action: 'stopTimer' });
-                }
+                backgroundWorker.postMessage({ action: 'stop' });
                 progressEl.style.width = '0%';
             }
         });

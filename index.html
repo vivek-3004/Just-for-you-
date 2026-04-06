@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulse of Positivity</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            overflow: hidden;
+            transition: background 3s ease;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        .serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .pulse-notification {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 1.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #timer-progress {
+            transition: width 1s linear;
+        }
+
+        /* Custom toggle styling */
+        .toggle-checkbox:checked + .toggle-slot {
+            background-color: #f43f5e;
+        }
+        .toggle-checkbox:checked + .toggle-slot .toggle-dot {
+            transform: translateX(20px);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-6 text-slate-800">
+
+    <!-- Background Elements -->
+    <div class="fixed inset-0 -z-10 opacity-30">
+        <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-rose-200 rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl animate-float" style="animation-delay: 2s;"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-2xl w-full text-center space-y-12">
+        
+        <header class="space-y-2">
+            <h1 class="text-xs uppercase tracking-[0.4em] font-semibold text-slate-500">Daily Sanctuary</h1>
+            <p class="serif text-4xl italic font-bold text-slate-900">For the Soul</p>
+        </header>
+
+        <!-- Affirmation Display -->
+        <div id="affirmation-container" class="glass-card rounded-[2.5rem] p-12 md:p-20 relative overflow-hidden transition-all duration-1000 min-h-[350px] flex flex-col justify-center">
+            <div id="quote-mark" class="absolute top-8 left-10 text-6xl text-rose-200 opacity-50 serif italic font-bold">"</div>
+            <p id="affirmation-text" class="serif text-3xl md:text-4xl leading-relaxed text-slate-800 italic fade-in">
+                Loading your inspiration...
+            </p>
+            <div class="mt-8 flex justify-center gap-4 opacity-0 transition-opacity duration-700" id="action-buttons">
+                <button onclick="speakAffirmation()" class="p-3 rounded-full bg-slate-100 hover:bg-rose-100 transition-colors text-slate-500 hover:text-rose-600" title="Listen">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                </button>
+                <button onclick="newAffirmation()" class="px-6 py-2 rounded-full border border-slate-200 hover:border-rose-300 text-sm font-medium transition-all hover:bg-white">
+                    Next Insight
+                </button>
+            </div>
+        </div>
+
+        <!-- Notification Control -->
+        <div class="glass-card rounded-3xl p-6 max-w-sm mx-auto space-y-4">
+            <div class="flex items-center justify-between">
+                <div class="text-left">
+                    <span class="text-sm font-bold block">Smart Notifications</span>
+                    <span id="notif-status" class="text-[10px] text-slate-400 uppercase tracking-tighter">Permission Required</span>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="timer-toggle" class="sr-only toggle-checkbox">
+                    <div class="toggle-slot w-11 h-6 bg-slate-200 rounded-full transition-colors relative">
+                        <div class="toggle-dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform"></div>
+                    </div>
+                </label>
+            </div>
+            
+            <div id="timer-settings" class="space-y-4 opacity-50 pointer-events-none transition-all">
+                <div class="flex items-center gap-4">
+                    <input type="range" id="interval-range" min="1" max="60" value="5" class="flex-1 accent-rose-500">
+                    <span class="text-sm font-bold w-12" id="interval-display">5m</span>
+                </div>
+                <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div id="timer-progress" class="bg-rose-400 h-full w-0"></div>
+                </div>
+                <p class="text-[10px] text-slate-400 uppercase tracking-widest text-center">Auto-Refresh Active</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Notification Toast (In-App) -->
+    <div id="notification-toast" class="fixed bottom-8 transform translate-y-32 transition-transform duration-500 ease-in-out glass-card border-rose-200 px-6 py-4 rounded-2xl flex items-center gap-4 z-50">
+        <div class="bg-rose-500 p-2 rounded-lg pulse-notification">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+        </div>
+        <div>
+            <p class="text-sm font-bold">New Inspiration</p>
+            <p class="text-xs text-slate-500">Take a moment for yourself.</p>
+        </div>
+    </div>
+
+    <script>
+        const affirmations = [
+            "You are exactly where you need to be to grow into your highest self.",
+            "Your worth is not defined by your productivity, but by your presence.",
+            "You have survived 100% of your hardest days. You are resilient.",
+            "Quiet progress is still progress. Be gentle with yourself today.",
+            "The world is better because you are in it, bringing your unique light.",
+            "You are allowed to take up space and speak your truth.",
+            "Your sensitivity is your superpower, not your weakness.",
+            "Every breath you take is a chance to start again.",
+            "You are enough, exactly as you are, right in this moment.",
+            "Your potential is limited only by the boundaries you place on yourself.",
+            "Radiate confidence, and the world will mirror it back to you.",
+            "Believe in the person you are becoming.",
+            "Your peace is more important than their opinions.",
+            "You are worthy of the love you so freely give others."
+        ];
+
+        let timerInterval;
+        let timeLeft = 0;
+        let totalTime = 0;
+
+        const textEl = document.getElementById('affirmation-text');
+        const buttonsEl = document.getElementById('action-buttons');
+        const toggleEl = document.getElementById('timer-toggle');
+        const rangeEl = document.getElementById('interval-range');
+        const displayEl = document.getElementById('interval-display');
+        const settingsEl = document.getElementById('timer-settings');
+        const progressEl = document.getElementById('timer-progress');
+        const toastEl = document.getElementById('notification-toast');
+        const statusEl = document.getElementById('notif-status');
+
+        // Request Browser Notification Permission
+        async function requestNotificationPermission() {
+            if (!("Notification" in window)) {
+                statusEl.innerText = "Unsupported Browser";
+                return false;
+            }
+            
+            if (Notification.permission === "granted") {
+                statusEl.innerText = "System Enabled";
+                return true;
+            }
+
+            const permission = await Notification.requestPermission();
+            if (permission === "granted") {
+                statusEl.innerText = "System Enabled";
+                return true;
+            } else {
+                statusEl.innerText = "Permission Denied";
+                return false;
+            }
+        }
+
+        function newAffirmation(isAuto = false) {
+            textEl.classList.remove('fade-in');
+            void textEl.offsetWidth; 
+            
+            const random = affirmations[Math.floor(Math.random() * affirmations.length)];
+            textEl.innerText = random;
+            textEl.classList.add('fade-in');
+            buttonsEl.style.opacity = '1';
+
+            if(isAuto) {
+                showNotifications(random);
+            }
+        }
+
+        function showNotifications(message) {
+            // 1. Show In-App Toast
+            toastEl.classList.remove('translate-y-32');
+            setTimeout(() => {
+                toastEl.classList.add('translate-y-32');
+            }, 5000);
+
+            // 2. Send System Notification if permitted
+            if (Notification.permission === "granted") {
+                new Notification("Pulse of Positivity", {
+                    body: message,
+                    icon: "https://cdn-icons-png.flaticon.com/512/3209/3209943.png" // Heart icon placeholder
+                });
+            }
+        }
+
+        function speakAffirmation() {
+            const speech = new SpeechSynthesisUtterance(textEl.innerText);
+            speech.rate = 0.9;
+            window.speechSynthesis.speak(speech);
+        }
+
+        function startTimer() {
+            const mins = parseInt(rangeEl.value);
+            totalTime = mins * 60;
+            timeLeft = totalTime;
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const percent = ((totalTime - timeLeft) / totalTime) * 100;
+                progressEl.style.width = `${percent}%`;
+
+                if (timeLeft <= 0) {
+                    newAffirmation(true);
+                    timeLeft = totalTime;
+                    progressEl.style.width = '0%';
+                }
+            }, 1000);
+        }
+
+        toggleEl.addEventListener('change', async (e) => {
+            if (e.target.checked) {
+                const permitted = await requestNotificationPermission();
+                settingsEl.style.opacity = '1';
+                settingsEl.style.pointerEvents = 'auto';
+                startTimer();
+            } else {
+                settingsEl.style.opacity = '0.5';
+                settingsEl.style.pointerEvents = 'none';
+                clearInterval(timerInterval);
+                progressEl.style.width = '0%';
+            }
+        });
+
+        rangeEl.addEventListener('input', (e) => {
+            displayEl.innerText = `${e.target.value}m`;
+            if (toggleEl.checked) startTimer();
+        });
+
+        window.onload = () => {
+            newAffirmation();
+            if ("Notification" in window) {
+                if (Notification.permission === "granted") {
+                    statusEl.innerText = "System Enabled";
+                }
+            }
+        };
+    </script>
+</body>
+</html>

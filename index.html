@@ -15,7 +15,6 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--bg-gradient);
             min-height: 100vh;
-            /* Allow scrolling on very short screens but hide scrollbar for aesthetic */
             overflow-x: hidden;
             transition: background 3s ease;
         }
@@ -71,7 +70,6 @@
             transform: translateX(20px);
         }
 
-        /* Custom Range Slider Styling */
         input[type=range] {
             -webkit-appearance: none;
             background: transparent;
@@ -96,13 +94,11 @@
 </head>
 <body class="flex flex-col items-center justify-center p-4 md:p-8 text-slate-800">
 
-    <!-- Background Elements -->
     <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-rose-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-float"></div>
         <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-blue-100 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-float" style="animation-delay: 3s;"></div>
     </div>
 
-    <!-- Main Content Container -->
     <div class="w-full max-w-3xl flex flex-col items-center gap-8 md:gap-12">
         
         <header class="text-center space-y-3 fade-in">
@@ -110,8 +106,7 @@
             <p class="serif text-5xl md:text-6xl italic font-bold text-slate-900 tracking-tight">Affirmation</p>
         </header>
 
-        <!-- Affirmation Display -->
-        <div id="affirmation-container" class="glass-card w-full rounded-[2rem] md:rounded-[3rem] p-8 md:p-16 relative overflow-hidden transition-all duration-1000 min-h-[320px] md:min-h-[400px] flex flex-col justify-center">
+        <div id="affirmation-container" class="glass-card w-full rounded-[2rem] md:rounded-[3rem] p-8 md:p-16 relative overflow-hidden min-h-[320px] md:min-h-[400px] flex flex-col justify-center">
             <div id="quote-mark" class="absolute top-6 left-8 md:top-10 md:left-12 text-6xl md:text-8xl text-rose-200 opacity-40 serif italic font-bold select-none">"</div>
             
             <p id="affirmation-text" class="serif text-2xl md:text-4xl lg:text-5xl leading-snug md:leading-relaxed text-slate-800 italic fade-in relative z-10 text-center">
@@ -119,21 +114,20 @@
             </p>
 
             <div class="mt-8 md:mt-12 flex flex-wrap justify-center gap-4 opacity-0 transition-opacity duration-700" id="action-buttons">
-                <button onclick="speakAffirmation()" class="p-4 rounded-full bg-slate-100/50 hover:bg-rose-100 transition-all text-slate-500 hover:text-rose-600 group" title="Listen">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-active:scale-90 transition-transform"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                <button onclick="speakAffirmation()" class="p-4 rounded-full bg-slate-100/50 hover:bg-rose-100 transition-all text-slate-500 hover:text-rose-600 group">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
                 </button>
-                <button onclick="newAffirmation()" class="px-8 py-3 rounded-full border border-slate-200 hover:border-rose-300 text-sm md:text-base font-semibold transition-all hover:bg-white hover:shadow-sm active:scale-95">
+                <button onclick="newAffirmation()" class="px-8 py-3 rounded-full border border-slate-200 hover:border-rose-300 text-sm md:text-base font-semibold transition-all hover:bg-white active:scale-95">
                     Next Insight
                 </button>
             </div>
         </div>
 
-        <!-- Notification Control -->
         <div class="glass-card w-full max-w-md rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-8 space-y-6">
             <div class="flex items-center justify-between">
                 <div class="text-left">
-                    <span class="text-sm md:text-base font-bold block text-slate-800">Timed Reminders</span>
-                    <span id="notif-status" class="text-[9px] md:text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Permission Needed</span>
+                    <span class="text-sm md:text-base font-bold block text-slate-800">Background Mode</span>
+                    <span id="notif-status" class="text-[9px] md:text-[10px] text-slate-400 uppercase tracking-widest font-semibold italic">Requires Permission</span>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="timer-toggle" class="sr-only toggle-checkbox">
@@ -153,42 +147,36 @@
                         <div id="timer-progress" class="bg-gradient-to-r from-rose-400 to-rose-500 h-full w-0"></div>
                     </div>
                 </div>
-                <p class="text-[9px] md:text-[10px] text-slate-400 uppercase tracking-[0.2em] text-center font-bold">Auto-Refresh Active</p>
+                <p class="text-[9px] md:text-[10px] text-slate-400 uppercase tracking-[0.2em] text-center font-bold italic">Works even if tab is closed</p>
             </div>
         </div>
-
     </div>
 
-    <!-- Notification Toast (In-App) -->
     <div id="notification-toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:right-8 md:translate-x-0 transform translate-y-32 transition-transform duration-700 ease-in-out glass-card border-rose-100 px-6 py-4 rounded-2xl flex items-center gap-4 z-50 w-[90%] md:w-auto">
         <div class="bg-rose-500 p-2.5 rounded-xl pulse-notification shrink-0 shadow-lg shadow-rose-200">
-            <!-- New Lotus/Wellness Icon -->
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-1.2 0-2.4.6-3.1 1.5-.7-.9-1.9-1.5-3.1-1.5-2.2 0-4 1.8-4 4 0 2.2 1.8 4 4 4 1.2 0 2.4-.6 3.1-1.5.7.9 1.9 1.5 3.1 1.5s2.4-.6 3.1-1.5c.7.9 1.9 1.5 3.1 1.5 2.2 0 4-1.8 4-4 0-2.2-1.8-4-4-4-1.2 0-2.4.6-3.1 1.5-.7-.9-1.9-1.5-3.1-1.5Z"/><path d="M12 12v9"/><path d="m8 21 4-4 4 4"/></svg>
         </div>
         <div class="overflow-hidden">
             <p class="text-sm font-bold text-slate-800">Inner Peace</p>
-            <p class="text-xs text-slate-500 truncate">A new affirmation is waiting for you.</p>
+            <p class="text-xs text-slate-500 truncate">New affirmation received.</p>
         </div>
     </div>
 
     <script>
         const affirmations = [
             "You are exactly where you need to be to grow into your highest self.",
-            "Your worth is not defined by your productivity, but by your presence.",
-            "You have survived 100% of your hardest days. You are resilient.",
-            "Quiet progress is still progress. Be gentle with yourself today.",
-            "The world is better because you are in it, bringing your unique light.",
+            "Your worth is not defined by your productivity.",
+            "You have survived 100% of your hardest days.",
+            "Quiet progress is still progress.",
+            "The world is better because you are in it.",
             "You are allowed to take up space and speak your truth.",
-            "Your sensitivity is your superpower, not your weakness.",
+            "Your sensitivity is your superpower.",
             "Every breath you take is a chance to start again.",
-            "You are enough, exactly as you are, right in this moment.",
-            "Your potential is limited only by the boundaries you place on yourself.",
-            "Radiate confidence, and the world will mirror it back to you.",
+            "You are enough, exactly as you are.",
             "Believe in the person you are becoming.",
             "Your peace is more important than their opinions.",
-            "You are worthy of the love you so freely give others.",
-            "Small steps lead to big changes. Keep moving forward.",
-            "I honor my need to rest and recharge without guilt."
+            "Small steps lead to big changes.",
+            "I honor my need to rest without guilt."
         ];
 
         let timerInterval;
@@ -205,67 +193,84 @@
         const toastEl = document.getElementById('notification-toast');
         const statusEl = document.getElementById('notif-status');
 
+        // Service Worker registration for Background Tasks
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('install', (event) => self.skipWaiting());
+                self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()));
+                
+                let backgroundTimer;
+                self.addEventListener('message', (event) => {
+                    if (event.data.action === 'startTimer') {
+                        clearInterval(backgroundTimer);
+                        let seconds = event.data.minutes * 60;
+                        backgroundTimer = setInterval(() => {
+                            seconds--;
+                            if (seconds <= 0) {
+                                self.registration.showNotification('Affirmation', {
+                                    body: event.data.message,
+                                    icon: 'https://img.icons8.com/ios-filled/100/f43f5e/lotus.png',
+                                    badge: 'https://img.icons8.com/ios-filled/100/f43f5e/lotus.png',
+                                    tag: 'affirmation-notif'
+                                });
+                                seconds = event.data.minutes * 60; // Loop
+                            }
+                        }, 1000);
+                    } else if (event.data.action === 'stopTimer') {
+                        clearInterval(backgroundTimer);
+                    }
+                });
+            `;
+            const blob = new Blob([swCode], { type: 'text/javascript' });
+            navigator.serviceWorker.register(URL.createObjectURL(blob));
+        }
+
         async function requestNotificationPermission() {
-            if (!("Notification" in window)) {
-                statusEl.innerText = "Unavailable";
-                return false;
-            }
-            
+            if (!("Notification" in window)) return false;
             if (Notification.permission === "granted") {
-                statusEl.innerText = "System Enabled";
+                statusEl.innerText = "System Active";
                 return true;
             }
-
             const permission = await Notification.requestPermission();
             if (permission === "granted") {
-                statusEl.innerText = "System Enabled";
+                statusEl.innerText = "System Active";
                 return true;
-            } else {
-                statusEl.innerText = "Permission Denied";
-                return false;
             }
+            statusEl.innerText = "Permission Denied";
+            return false;
         }
 
         function newAffirmation(isAuto = false) {
             textEl.classList.remove('fade-in');
             void textEl.offsetWidth; 
-            
             const random = affirmations[Math.floor(Math.random() * affirmations.length)];
             textEl.innerText = random;
             textEl.classList.add('fade-in');
             buttonsEl.style.opacity = '1';
 
             if(isAuto) {
-                showNotifications(random);
+                toastEl.classList.remove('translate-y-32');
+                setTimeout(() => toastEl.classList.add('translate-y-32'), 6000);
             }
-        }
-
-        function showNotifications(message) {
-            // 1. Show In-App Toast
-            toastEl.classList.remove('translate-y-32');
-            setTimeout(() => {
-                toastEl.classList.add('translate-y-32');
-            }, 6000);
-
-            // 2. Send System Notification
-            if (Notification.permission === "granted") {
-                try {
-                    new Notification("Affirmation", {
-                        body: message,
-                        icon: "https://img.icons8.com/ios-filled/100/f43f5e/lotus.png"
-                    });
-                } catch (e) {
-                    console.log("Notification error: ", e);
-                }
-            }
+            return random;
         }
 
         function speakAffirmation() {
-            window.speechSynthesis.cancel(); // Stop current
+            window.speechSynthesis.cancel();
             const speech = new SpeechSynthesisUtterance(textEl.innerText);
             speech.rate = 0.85;
-            speech.pitch = 1.1;
             window.speechSynthesis.speak(speech);
+        }
+
+        function syncWithBackground() {
+            if (navigator.serviceWorker.controller) {
+                const message = affirmations[Math.floor(Math.random() * affirmations.length)];
+                navigator.serviceWorker.controller.postMessage({
+                    action: 'startTimer',
+                    minutes: parseInt(rangeEl.value),
+                    message: message
+                });
+            }
         }
 
         function startTimer() {
@@ -274,15 +279,15 @@
             timeLeft = totalTime;
             
             clearInterval(timerInterval);
+            syncWithBackground();
+
             timerInterval = setInterval(() => {
                 timeLeft--;
-                const percent = ((totalTime - timeLeft) / totalTime) * 100;
-                progressEl.style.width = `${percent}%`;
-
+                progressEl.style.width = `${((totalTime - timeLeft) / totalTime) * 100}%`;
                 if (timeLeft <= 0) {
                     newAffirmation(true);
                     timeLeft = totalTime;
-                    progressEl.style.width = '0%';
+                    syncWithBackground(); // Refresh the next message for BG
                 }
             }, 1000);
         }
@@ -290,13 +295,20 @@
         toggleEl.addEventListener('change', async (e) => {
             if (e.target.checked) {
                 const permitted = await requestNotificationPermission();
-                settingsEl.style.opacity = '1';
-                settingsEl.style.pointerEvents = 'auto';
-                startTimer();
+                if (permitted) {
+                    settingsEl.style.opacity = '1';
+                    settingsEl.style.pointerEvents = 'auto';
+                    startTimer();
+                } else {
+                    e.target.checked = false;
+                }
             } else {
                 settingsEl.style.opacity = '0.4';
                 settingsEl.style.pointerEvents = 'none';
                 clearInterval(timerInterval);
+                if (navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.controller.postMessage({ action: 'stopTimer' });
+                }
                 progressEl.style.width = '0%';
             }
         });
@@ -309,7 +321,7 @@
         window.onload = () => {
             newAffirmation();
             if ("Notification" in window && Notification.permission === "granted") {
-                statusEl.innerText = "System Enabled";
+                statusEl.innerText = "System Active";
             }
         };
     </script>
